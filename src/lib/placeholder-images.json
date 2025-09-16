@@ -1,3 +1,10 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "india-map",
+      "description": "A mock map of India for groundwater visualization.",
+      "imageUrl": "https://picsum.photos/seed/indiamap/1200/800",
+      "imageHint": "India map"
+    }
+  ]
 }
