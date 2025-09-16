@@ -3,17 +3,20 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { Sparkles, Mic, Loader2, Bot, User } from 'lucide-react';
+import { Sparkles, Mic, Loader2, Bot, User, Languages } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { waterDataAgent } from '@/ai/flows/water-data-agent';
 import { ScrollArea } from './ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { RetellClient } from 'retell-sdk';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface Message {
     role: 'user' | 'assistant';
     content: string;
 }
+
+type Language = 'en-US' | 'hi-IN';
 
 const retell = new RetellClient();
 
@@ -23,6 +26,7 @@ export default function AiAssistant() {
     const [isLoading, setIsLoading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [transcript, setTranscript] = useState('');
+    const [language, setLanguage] = useState<Language>('en-US');
     const { toast } = useToast();
     const recognitionRef = useRef<any>(null);
 
@@ -31,7 +35,7 @@ export default function AiAssistant() {
             const recognition = new webkitSpeechRecognition();
             recognition.continuous = true;
             recognition.interimResults = true;
-            recognition.lang = 'hi-IN';
+            recognition.lang = language;
 
             recognition.onresult = (event) => {
                 let interimTranscript = '';
@@ -62,7 +66,7 @@ export default function AiAssistant() {
             
             recognitionRef.current = recognition;
         }
-    }, [toast]);
+    }, [toast, language]);
     
     const toggleListening = () => {
         if (!recognitionRef.current) {
@@ -89,7 +93,7 @@ export default function AiAssistant() {
     const speak = (text: string) => {
         if (typeof window !== 'undefined' && window.speechSynthesis) {
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'hi-IN';
+            utterance.lang = language;
             window.speechSynthesis.speak(utterance);
         }
     };
@@ -108,7 +112,9 @@ export default function AiAssistant() {
             speak(result.answer);
         } catch (error) {
             console.error('AI agent failed:', error);
-            const errorMessage = 'माफ़ कीजिए, मुझे जवाब मिलने में कठिनाई हुई। कृपया पुनः प्रयास करें।';
+            const errorMessage = language === 'hi-IN' 
+                ? 'माफ़ कीजिए, मुझे जवाब मिलने में कठिनाई हुई। कृपया पुनः प्रयास करें।'
+                : 'Sorry, I had trouble getting a response. Please try again.';
             setMessages([...newMessages, { role: 'assistant', content: errorMessage }]);
             toast({
                 variant: 'destructive',
@@ -145,12 +151,30 @@ export default function AiAssistant() {
             <Dialog open={isOpen} onOpenChange={handleOpenChange}>
                 <DialogContent className="sm:max-w-[425px] md:max-w-[600px] flex flex-col h-[70vh]">
                     <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <Bot /> AI Assistant
-                        </DialogTitle>
-                        <DialogDescription>
-                            Ask me about groundwater levels. Click the mic to use your voice.
-                        </DialogDescription>
+                        <div className="flex justify-between items-start">
+                            <div className='space-y-1.5'>
+                                <DialogTitle className="flex items-center gap-2">
+                                    <Bot /> AI Assistant
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Ask about groundwater levels in English or Hindi.
+                                </DialogDescription>
+                            </div>
+                            <div className='w-[150px]'>
+                                <Select value={language} onValueChange={(value) => setLanguage(value as Language)}>
+                                    <SelectTrigger>
+                                        <div className='flex items-center gap-2'>
+                                            <Languages className="h-4 w-4" />
+                                            <SelectValue placeholder="Language" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="en-US">English</SelectItem>
+                                        <SelectItem value="hi-IN">हिन्दी (Hindi)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
                     </DialogHeader>
                     <ScrollArea className="flex-1 -mx-6 px-6">
                         <div className="space-y-4 pr-4">
@@ -178,7 +202,11 @@ export default function AiAssistant() {
                             <textarea
                                 value={transcript}
                                 onChange={(e) => setTranscript(e.target.value)}
-                                placeholder={isListening ? 'सुन रहा है...' : 'एक सवाल पूछो...'}
+                                placeholder={
+                                    isListening
+                                      ? language === 'hi-IN' ? 'सुन रहा है...' : 'Listening...'
+                                      : language === 'hi-IN' ? 'एक सवाल पूछो...' : 'Ask a question...'
+                                  }
                                 className="w-full border rounded-full p-3 pl-4 pr-20 min-h-[50px] max-h-[150px] resize-none"
                                 onKeyDown={(e) => {
                                     if(e.key === 'Enter' && !e.shiftKey) {
