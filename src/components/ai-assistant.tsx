@@ -30,6 +30,14 @@ export default function AiAssistant() {
     const { toast } = useToast();
     const recognitionRef = useRef<any>(null);
 
+    // Ensure speech synthesis is ready
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            // This is a common trick to kickstart speech synthesis on some browsers
+            window.speechSynthesis.getVoices();
+        }
+    }, []);
+
     useEffect(() => {
         if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
             const recognition = new webkitSpeechRecognition();
@@ -92,8 +100,15 @@ export default function AiAssistant() {
 
     const speak = (text: string) => {
         if (typeof window !== 'undefined' && window.speechSynthesis) {
+            window.speechSynthesis.cancel(); // Clear any previous utterances
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = language;
+            // Optional: Find a specific voice if needed
+            const voices = window.speechSynthesis.getVoices();
+            let voice = voices.find(v => v.lang === language);
+            if (voice) {
+                utterance.voice = voice;
+            }
             window.speechSynthesis.speak(utterance);
         }
     };
