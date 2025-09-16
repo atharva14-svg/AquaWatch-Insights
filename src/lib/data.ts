@@ -17,14 +17,19 @@ const getStatus = (level: number): 'Critical' | 'Warning' | 'Normal' => {
   return "Normal";
 };
 
-const generateTimeSeries = (baseLevel: number): TimeSeriesData[] => {
+// A simple pseudo-random number generator to ensure deterministic data
+const seededRandom = (seed: number) => {
+    let s = Math.sin(seed) * 10000;
+    return s - Math.floor(s);
+};
+
+const generateTimeSeries = (baseLevel: number, seed: number): TimeSeriesData[] => {
   const data: TimeSeriesData[] = [];
   const today = new Date();
   for (let i = 0; i < 365; i++) {
     const date = new Date(today);
     date.setDate(today.getDate() - (364 - i));
-    const variation = (Math.random() - 0.5) * 2;
-    // A bit of seasonality
+    const variation = (seededRandom(seed + i) - 0.5) * 2;
     const seasonal = Math.sin((date.getMonth() / 12) * 2 * Math.PI) * 2;
     const level = Math.max(0.5, baseLevel + variation + seasonal);
     data.push({
@@ -37,10 +42,9 @@ const generateTimeSeries = (baseLevel: number): TimeSeriesData[] => {
 
 const generateMockData = (): Station[] => {
   return stationsMeta.map((station, index) => {
-    // Use a seed for Math.random to make it deterministic for hydration
-    const seed = index / stationsMeta.length;
-    const baseLevel = (seed * 18) + 2; // Base level between 2 and 20
-    const timeSeries = generateTimeSeries(baseLevel);
+    const seed = index + 1; // Use index as part of the seed
+    const baseLevel = (seededRandom(seed) * 18) + 2; // Base level between 2 and 20
+    const timeSeries = generateTimeSeries(baseLevel, seed);
     const currentLevel = timeSeries[timeSeries.length - 1].level;
     const status = getStatus(currentLevel);
 
