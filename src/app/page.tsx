@@ -5,6 +5,7 @@ import FarmerView from '@/components/farmer-view';
 import PolicymakerDashboard from '@/components/policymaker-dashboard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { mockStationData } from '@/lib/data';
+import AiAssistant from '@/components/ai-assistant';
 
 export default function Home() {
   return (
@@ -26,6 +27,7 @@ export default function Home() {
           </Tabs>
         </div>
       </main>
+      <AiAssistant />
     </div>
   );
 }
