@@ -31,7 +31,7 @@ export default function AiAssistant() {
             const recognition = new webkitSpeechRecognition();
             recognition.continuous = true;
             recognition.interimResults = true;
-            recognition.lang = 'en-US';
+            recognition.lang = 'hi-IN';
 
             recognition.onresult = (event) => {
                 let interimTranscript = '';
@@ -89,7 +89,7 @@ export default function AiAssistant() {
     const speak = (text: string) => {
         if (typeof window !== 'undefined' && window.speechSynthesis) {
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';
+            utterance.lang = 'hi-IN';
             window.speechSynthesis.speak(utterance);
         }
     };
@@ -108,7 +108,7 @@ export default function AiAssistant() {
             speak(result.answer);
         } catch (error) {
             console.error('AI agent failed:', error);
-            const errorMessage = 'Sorry, I had trouble getting an answer. Please try again.';
+            const errorMessage = 'माफ़ कीजिए, मुझे जवाब मिलने में कठिनाई हुई। कृपया पुनः प्रयास करें।';
             setMessages([...newMessages, { role: 'assistant', content: errorMessage }]);
             toast({
                 variant: 'destructive',
@@ -178,7 +178,7 @@ export default function AiAssistant() {
                             <textarea
                                 value={transcript}
                                 onChange={(e) => setTranscript(e.target.value)}
-                                placeholder={isListening ? 'Listening...' : 'Ask a question...'}
+                                placeholder={isListening ? 'सुन रहा है...' : 'एक सवाल पूछो...'}
                                 className="w-full border rounded-full p-3 pl-4 pr-20 min-h-[50px] max-h-[150px] resize-none"
                                 onKeyDown={(e) => {
                                     if(e.key === 'Enter' && !e.shiftKey) {

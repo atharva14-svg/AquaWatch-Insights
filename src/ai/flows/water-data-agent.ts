@@ -9,7 +9,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 import { mockStationData } from '@/lib/data';
 
 const WaterDataAgentInputSchema = z.object({
@@ -32,6 +32,7 @@ const prompt = ai.definePrompt({
     output: { schema: WaterDataAgentOutputSchema },
     prompt: `You are a helpful assistant for the AquaWatch Insights app.
 You can answer questions about groundwater monitoring stations.
+The user might ask in English or Hindi. Respond in the language of the query.
 Use the provided station data to answer the user's query.
 If the user asks a general question, greet them and ask how you can help with water data.
 If you don't know the answer, say that you don't have that information.
