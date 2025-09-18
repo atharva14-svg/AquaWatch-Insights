@@ -6,7 +6,7 @@ import { Map, Marker } from 'pigeon-maps';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Station } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { Droplets, MapPin, TrendingUp, X } from 'lucide-react';
+import { Droplets, MapPin, TrendingUp, X, AlertTriangle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { StationChart } from './station-chart';
@@ -16,6 +16,7 @@ interface MapViewProps {
   center: [number, number];
   zoom: number;
   title: string;
+  showDepthCategory?: boolean;
 }
 
 const statusColors: { [key in Station['status']]: string } = {
@@ -24,8 +25,28 @@ const statusColors: { [key in Station['status']]: string } = {
   Critical: 'hsl(var(--destructive))',
 };
 
-export default function MapView({ stations, center, zoom, title }: MapViewProps) {
+const depthColors = (level: number): string => {
+    if (level <= 2) return 'hsl(210 40% 96.1%)'; // Lighter
+    if (level <= 5) return 'hsl(228 64% 50%)';   // Medium
+    return 'hsl(228 64% 20%)'; // Darker
+};
+
+export default function MapView({ stations, center, zoom, title, showDepthCategory = false }: MapViewProps) {
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
+
+  const getMarkerColor = (station: Station) => {
+      if (showDepthCategory) {
+          return depthColors(station.currentLevel);
+      }
+      return statusColors[station.status];
+  }
+  
+  const isDecliningAndDeep = (station: Station) => {
+    // This is a mock implementation. A real one would compare to decadal mean.
+    const trend_10yr = station.id.includes("MHW") ? "declining" : "stable"; // Mock
+    const depth_to_water_level_m = station.currentLevel;
+    return trend_10yr === "declining" && depth_to_water_level_m > 4.0;
+  }
 
   return (
     <Card className="relative">
@@ -37,11 +58,15 @@ export default function MapView({ stations, center, zoom, title }: MapViewProps)
           {stations.map(station => (
             <Marker
               key={station.id}
-              width={30}
+              width={isDecliningAndDeep(station) ? 40 : 30}
               anchor={[station.lat, station.lng]}
-              color={statusColors[station.status]}
+              color={getMarkerColor(station)}
               onClick={() => setSelectedStation(station)}
-            />
+            >
+                {isDecliningAndDeep(station) && (
+                    <AlertTriangle className="h-4 w-4 text-white fill-yellow-500" />
+                )}
+            </Marker>
           ))}
         </Map>
       </CardContent>
