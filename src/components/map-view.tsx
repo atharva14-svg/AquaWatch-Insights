@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Map, Marker, Overlay } from 'pigeon-maps';
+import { Map, Marker } from 'pigeon-maps';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Station } from '@/lib/types';
 import { cn } from '@/lib/utils';

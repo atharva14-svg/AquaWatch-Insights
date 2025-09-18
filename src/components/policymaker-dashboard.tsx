@@ -1,15 +1,18 @@
 
+
 'use client';
 
 import { Droplets, MapPin, ShieldAlert, BarChart, Lightbulb, TrendingUp } from 'lucide-react';
 import type { Station, TimeSeriesData } from '@/lib/types';
 import { MetricCard } from './metric-card';
-import MapView from './map-view';
 import { StationChart } from './station-chart';
 import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bar, BarChart as RechartsBarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import dynamic from 'next/dynamic';
+
+const MapView = dynamic(() => import('./map-view'), { ssr: false });
 
 
 interface PolicymakerDashboardProps {
