@@ -66,11 +66,13 @@ export default function AiAssistant() {
 
             recognition.onerror = (event) => {
                 console.error('Speech recognition error', event.error);
-                toast({
-                    variant: 'destructive',
-                    title: 'Speech Recognition Error',
-                    description: 'Could not start speech recognition.',
-                });
+                if (event.error !== 'aborted') {
+                  toast({
+                      variant: 'destructive',
+                      title: 'Speech Recognition Error',
+                      description: 'Could not start speech recognition.',
+                  });
+                }
                 setIsListening(false);
             };
             
