@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Droplets, MapPin, ShieldAlert } from 'lucide-react';
@@ -56,7 +57,7 @@ export default function PolicymakerDashboard({ stations }: PolicymakerDashboardP
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <MapView />
+        <MapView stations={stations} />
         <StationChart 
             data={overallTimeSeries}
             title="Overall Groundwater Trend"
