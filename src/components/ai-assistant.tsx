@@ -10,13 +10,15 @@ import { ScrollArea } from './ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { RetellClient } from 'retell-sdk';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Textarea } from './ui/textarea';
+
 
 interface Message {
     role: 'user' | 'assistant';
     content: string;
 }
 
-type Language = 'en-US' | 'hi-IN';
+type Language = 'en-US' | 'hi-IN' | 'mr-IN';
 
 const retell = new RetellClient();
 
@@ -129,6 +131,8 @@ export default function AiAssistant() {
             console.error('AI agent failed:', error);
             const errorMessage = language === 'hi-IN' 
                 ? 'माफ़ कीजिए, मुझे जवाब मिलने में कठिनाई हुई। कृपया पुनः प्रयास करें।'
+                : language === 'mr-IN'
+                ? 'क्षमस्व, मला प्रतिसाद मिळवण्यात अडचण आली. कृपया पुन्हा प्रयत्न करा.'
                 : 'Sorry, I had trouble getting a response. Please try again.';
             setMessages([...newMessages, { role: 'assistant', content: errorMessage }]);
             toast({
@@ -172,7 +176,7 @@ export default function AiAssistant() {
                                     <Bot /> AI Assistant
                                 </DialogTitle>
                                 <DialogDescription>
-                                    Ask about groundwater levels in English or Hindi.
+                                Ask about groundwater levels in English, Hindi, or Marathi.
                                 </DialogDescription>
                             </div>
                             <div className='w-[150px]'>
@@ -186,6 +190,7 @@ export default function AiAssistant() {
                                     <SelectContent>
                                         <SelectItem value="en-US">English</SelectItem>
                                         <SelectItem value="hi-IN">हिन्दी (Hindi)</SelectItem>
+                                        <SelectItem value="mr-IN">मराठी (Marathi)</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -214,13 +219,13 @@ export default function AiAssistant() {
                     </ScrollArea>
                     <DialogFooter className="mt-auto !justify-center">
                         <div className='w-full relative'>
-                            <textarea
+                            <Textarea
                                 value={transcript}
                                 onChange={(e) => setTranscript(e.target.value)}
                                 placeholder={
                                     isListening
-                                      ? language === 'hi-IN' ? 'सुन रहा है...' : 'Listening...'
-                                      : language === 'hi-IN' ? 'एक सवाल पूछो...' : 'Ask a question...'
+                                      ? language === 'hi-IN' ? 'सुन रहा है...' : language === 'mr-IN' ? 'ऐकत आहे...' : 'Listening...'
+                                      : language === 'hi-IN' ? 'एक सवाल पूछो...' : language === 'mr-IN' ? 'प्रश्न विचारा...' : 'Ask a question...'
                                   }
                                 className="w-full border rounded-full p-3 pl-4 pr-20 min-h-[50px] max-h-[150px] resize-none"
                                 onKeyDown={(e) => {
