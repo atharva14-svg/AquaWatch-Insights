@@ -13,6 +13,9 @@ import { StationChart } from './station-chart';
 
 interface MapViewProps {
   stations: Station[];
+  center: [number, number];
+  zoom: number;
+  title: string;
 }
 
 const statusColors: { [key in Station['status']]: string } = {
@@ -21,18 +24,16 @@ const statusColors: { [key in Station['status']]: string } = {
   Critical: 'hsl(var(--destructive))',
 };
 
-export default function MapView({ stations }: MapViewProps) {
+export default function MapView({ stations, center, zoom, title }: MapViewProps) {
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
-
-  const indiaCenter: [number, number] = [20.5937, 78.9629];
 
   return (
     <Card className="relative">
       <CardHeader>
-        <CardTitle>Geospatial Overview</CardTitle>
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="aspect-[3/2] w-full p-0 overflow-hidden rounded-lg">
-        <Map defaultCenter={indiaCenter} defaultZoom={5}>
+        <Map defaultCenter={center} defaultZoom={zoom}>
           {stations.map(station => (
             <Marker
               key={station.id}

@@ -27,7 +27,7 @@ interface DistrictStatus {
 }
 
 export default function PolicymakerDashboard({ stations }: PolicymakerDashboardProps) {
-  const { totalStations, criticalCount, warningCount, normalCount, overallTimeSeries, maharashtraDistrictStatus } = useMemo(() => {
+  const { totalStations, criticalCount, warningCount, normalCount, overallTimeSeries, maharashtraStations, maharashtraDistrictStatus } = useMemo(() => {
     const totalStations = stations.length;
     let criticalCount = 0;
     let warningCount = 0;
@@ -67,7 +67,7 @@ export default function PolicymakerDashboard({ stations }: PolicymakerDashboardP
     });
     const maharashtraDistrictStatus = Object.values(districtStatusMap);
 
-    return { totalStations, criticalCount, warningCount, normalCount, overallTimeSeries, maharashtraDistrictStatus };
+    return { totalStations, criticalCount, warningCount, normalCount, overallTimeSeries, maharashtraStations, maharashtraDistrictStatus };
   }, [stations]);
 
   // Mock data for graphic strategies
@@ -91,7 +91,12 @@ export default function PolicymakerDashboard({ stations }: PolicymakerDashboardP
             </div>
 
             <div className="grid gap-6 lg:grid-cols-2">
-                <MapView stations={stations} />
+                <MapView 
+                    stations={stations}
+                    center={[20.5937, 78.9629]}
+                    zoom={5}
+                    title="Geospatial Overview"
+                />
                 <StationChart 
                     data={overallTimeSeries}
                     title="Overall Groundwater Trend"
@@ -100,30 +105,38 @@ export default function PolicymakerDashboard({ stations }: PolicymakerDashboardP
             </div>
         </TabsContent>
         <TabsContent value="maharashtra" className="mt-6 space-y-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <BarChart className="h-5 w-5 text-primary" />
-                        District-wise Station Status in Maharashtra
-                    </CardTitle>
-                    <CardDescription>
-                        Number of stations in Critical, Warning, and Normal status for each district.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <RechartsBarChart data={maharashtraDistrictStatus}>
-                            <XAxis dataKey="district" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Bar dataKey="Critical" fill="hsl(var(--destructive))" />
-                            <Bar dataKey="Warning" fill="hsl(var(--chart-4))" />
-                            <Bar dataKey="Normal" fill="hsl(var(--chart-2))" />
-                        </RechartsBarChart>
-                    </ResponsiveContainer>
-                </CardContent>
-            </Card>
+            <div className="grid gap-6 lg:grid-cols-2">
+                <MapView 
+                    stations={maharashtraStations}
+                    center={[19.7515, 75.7139]}
+                    zoom={6}
+                    title="Maharashtra Geospatial Overview"
+                />
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <BarChart className="h-5 w-5 text-primary" />
+                            District-wise Station Status in Maharashtra
+                        </CardTitle>
+                        <CardDescription>
+                            Number of stations in Critical, Warning, and Normal status for each district.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <RechartsBarChart data={maharashtraDistrictStatus}>
+                                <XAxis dataKey="district" />
+                                <YAxis />
+                                <Tooltip />
+                                <Legend />
+                                <Bar dataKey="Critical" fill="hsl(var(--destructive))" />
+                                <Bar dataKey="Warning" fill="hsl(var(--chart-4))" />
+                                <Bar dataKey="Normal" fill="hsl(var(--chart-2))" />
+                            </RechartsBarChart>
+                        </ResponsiveContainer>
+                    </CardContent>
+                </Card>
+            </div>
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
